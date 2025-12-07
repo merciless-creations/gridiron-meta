@@ -1,0 +1,4 @@
+# Subdirectory repos - each is its own git repository
+gridiron/
+gridiron-engine/
+gridiron-web/
