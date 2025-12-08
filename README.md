@@ -102,6 +102,43 @@ After creating the link, run `claude` from any of the child repos and type `/` t
 
 Plus any repo-specific commands defined in that repo's `.claude/commands/` directory.
 
+## Using the Slash Commands
+
+Type the slash command at the start of your message to activate that "persona" for the conversation:
+
+### `/dev [your task]` - Development mode
+- "Implement the player stats API endpoint from issue #45"
+- "Fix the bug where games don't save scores"
+- Focuses on: clean code, following existing patterns, testing, building
+
+### `/plan [what to plan]` - Planning mode  
+- "How should we implement the team roster management feature?"
+- "Analyze the codebase for adding multiplayer support"
+- Focuses on: exploring code, breaking down work, identifying risks, NO implementation
+
+### `/qa [what to test]` - QA/Testing mode
+- "Review test coverage for the game simulation engine"
+- "Check if the player creation tests are deterministic"
+- Focuses on: finding edge cases, ensuring deterministic tests, test coverage
+
+### `/requirements [vague idea]` - Requirements refinement mode
+- "We need a way for users to manage their teams"
+- "Add playoff bracket functionality"
+- Focuses on: asking clarifying questions, defining acceptance criteria, breaking into sub-tasks
+
+### `/review [PR or changes]` - Code review mode
+- "Review the changes in PR #23"
+- "Check the latest commits for issues"
+- Focuses on: finding bugs, checking completeness, verifying tests exist
+
+### Typical Workflow
+
+1. `/requirements` - Start with vague idea, get clear specs
+2. `/plan` - Create implementation plan
+3. `/dev` - Actually write the code
+4. `/qa` - Verify test coverage
+5. `/review` - Final check before merge
+
 ## How It Works Together
 
 When you run `claude` from `gridiron-engine/`:
