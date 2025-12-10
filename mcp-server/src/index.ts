@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -278,15 +279,7 @@ server.tool(
   "get_repo_info",
   "Get detailed information about a specific Gridiron repository",
   {
-    type: "object",
-    properties: {
-      repo: {
-        type: "string",
-        enum: ["gridiron", "gridiron-web", "gridiron-engine", "gridiron-meta"],
-        description: "The repository name",
-      },
-    },
-    required: ["repo"],
+    repo: z.enum(["gridiron", "gridiron-web", "gridiron-engine", "gridiron-meta"]).describe("The repository name"),
   },
   async (params: { repo: string }) => {
     const repoInfo: Record<string, object> = {
@@ -383,15 +376,7 @@ server.tool(
   "get_github_project",
   "Get the correct GitHub Project for a given issue type or repository",
   {
-    type: "object",
-    properties: {
-      type: {
-        type: "string",
-        enum: ["parent", "gridiron", "gridiron-web", "gridiron-engine"],
-        description: "Issue type: 'parent' for epics, or repo name for repo-specific issues",
-      },
-    },
-    required: ["type"],
+    type: z.enum(["parent", "gridiron", "gridiron-web", "gridiron-engine"]).describe("Issue type: 'parent' for epics, or repo name for repo-specific issues"),
   },
   async (params: { type: string }) => {
     const projects: Record<string, object> = {
