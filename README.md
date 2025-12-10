@@ -5,19 +5,24 @@ Shared Claude Code configuration for the Gridiron multi-repo project.
 ## Quick Start
 
 ```bash
-# 1. Build and register the MCP server (one-time setup)
-cd mcp-server
-npm install && npm run build
-claude mcp add gridiron-context node dist/index.js
+# Clone this repo as your workspace root
+git clone git@github.com:merciless-creations/gridiron-meta.git
+cd gridiron-meta
 
-# 2. Link shared slash commands to your user config (one-time setup)
-# Windows:
-mklink /J "%USERPROFILE%\.claude\commands" "C:\path\to\gridiron-meta\.claude\commands"
-# macOS/Linux:
-ln -s /path/to/gridiron-meta/.claude/commands ~/.claude/commands
+# Run the setup script (clones repos, links commands, registers MCP server)
+# Windows (PowerShell):
+.\setup.ps1
 
-# 3. Restart Claude Code to pick up changes
+# Windows (Git Bash) / macOS / Linux:
+./setup.sh
+
+# Restart Claude Code to pick up changes
 ```
+
+The setup script will:
+1. Clone the sibling repositories (gridiron, gridiron-engine, gridiron-web)
+2. Link shared slash commands to your user config (~/.claude/commands)
+3. Build and register the MCP server with Claude Code
 
 ## What This Repo Contains
 
@@ -34,6 +39,8 @@ gridiron-meta/
 │   ├── src/index.ts        # Server implementation
 │   ├── docs/               # Project documentation (17 files)
 │   └── README.md           # MCP server details
+├── setup.sh                # Setup script for macOS/Linux/Git Bash
+├── setup.ps1               # Setup script for Windows PowerShell
 ├── .gitignore              # Excludes gridiron-* subdirectories
 ├── CLAUDE.md               # Shared project instructions (auto-inherited)
 └── README.md               # This file
@@ -69,9 +76,9 @@ Unlike `CLAUDE.md`, slash commands do **NOT** inherit from parent directories. C
 
 Since our repos are nested inside `gridiron-meta/`, the shared commands in `gridiron-meta/.claude/commands/` would NOT be available when working in `gridiron-engine/`.
 
-**Solution**: Symlink/junction the shared commands to your user-level directory.
+**Solution**: The setup script links shared commands to your user-level directory.
 
-## Setup Instructions
+## Manual Setup (If Not Using Scripts)
 
 ### Prerequisites
 
