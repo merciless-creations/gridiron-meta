@@ -10,7 +10,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.2.0"
+    "@modelcontextprotocol/sdk": "1.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
