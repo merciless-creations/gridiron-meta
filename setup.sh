@@ -44,11 +44,12 @@ if [ "$NEED_CLONE" = true ]; then
         echo "  [WARN] SSH access to GitHub not configured."
         echo ""
         echo "  To configure SSH (recommended):"
-        echo "    1. Generate a key:  ssh-keygen -t ed25519 -C \"your-email@example.com\""
-        echo "    2. Start agent:     eval \"\$(ssh-agent -s)\""
+        echo "    1. Generate key:   ssh-keygen -t ed25519 -C \"your-email@example.com\""
+        echo "    2. Start agent (run in separate terminal first):     eval \"\$(ssh-agent -s)\""
         echo "    3. Add key:         ssh-add ~/.ssh/id_ed25519"
         echo "    4. Copy public key: cat ~/.ssh/id_ed25519.pub"
-        echo "    5. Add to GitHub:   https://github.com/settings/keys"
+        echo "    5. Add to GitHub:     https://github.com/settings/keys"
+        echo "    6. Test:            ssh -T git@github.com"
         echo ""
         read -p "  Use HTTPS instead? [Y/n]: " choice
         case "$choice" in
