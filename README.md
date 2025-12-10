@@ -2,6 +2,23 @@
 
 Shared Claude Code configuration for the Gridiron multi-repo project.
 
+## Quick Start
+
+```bash
+# 1. Build and register the MCP server (one-time setup)
+cd mcp-server
+npm install && npm run build
+claude mcp add gridiron-context node dist/index.js
+
+# 2. Link shared slash commands to your user config (one-time setup)
+# Windows:
+mklink /J "%USERPROFILE%\.claude\commands" "C:\path\to\gridiron-meta\.claude\commands"
+# macOS/Linux:
+ln -s /path/to/gridiron-meta/.claude/commands ~/.claude/commands
+
+# 3. Restart Claude Code to pick up changes
+```
+
 ## What This Repo Contains
 
 ```
@@ -13,6 +30,10 @@ gridiron-meta/
 │       ├── qa.md           # /qa - QA agent persona
 │       ├── requirements.md # /requirements - Requirements agent persona
 │       └── review.md       # /review - Code review agent persona
+├── mcp-server/             # MCP server for project context
+│   ├── src/index.ts        # Server implementation
+│   ├── docs/               # Project documentation (17 files)
+│   └── README.md           # MCP server details
 ├── .gitignore              # Excludes gridiron-* subdirectories
 ├── CLAUDE.md               # Shared project instructions (auto-inherited)
 └── README.md               # This file
@@ -189,3 +210,106 @@ Junctions (`/J`) don't require admin. Symlinks (`/D`) do. Use junctions.
 | [gridiron-web](https://github.com/merciless-creations/gridiron-web) | React/TypeScript frontend | [Project 3](https://github.com/orgs/merciless-creations/projects/3) |
 
 Parent project board: [Goal To Go Football](https://github.com/orgs/merciless-creations/projects/4)
+
+---
+
+## MCP Server
+
+The MCP (Model Context Protocol) server provides Claude Code with comprehensive project context including documentation, coding guidelines, and tools.
+
+### What It Provides
+
+**Resources (17 total):**
+| Resource | URI | Description |
+|----------|-----|-------------|
+| Project Overview | `gridiron://project/overview` | High-level project description |
+| Repository Map | `gridiron://project/repos` | All repos with purposes |
+| Architecture | `gridiron://project/architecture` | Multi-repo architecture |
+| C# Guidelines | `gridiron://guidelines/csharp` | .NET coding standards |
+| TypeScript Guidelines | `gridiron://guidelines/typescript` | TS/React patterns |
+| Testing Guidelines | `gridiron://guidelines/testing` | Deterministic test rules |
+| Git Guidelines | `gridiron://guidelines/git` | Commit message format |
+| Architecture Principles | `gridiron://guidelines/architecture-principles` | Core design decisions |
+| Engine Philosophy | `gridiron://engine/philosophy` | Outcome-first simulation |
+| Statistical Targets | `gridiron://engine/statistical-targets` | NFL-derived targets |
+| Attribute Mappings | `gridiron://engine/attribute-mappings` | Player attribute system |
+| Frontend Design | `gridiron://frontend/design-system` | UI component patterns |
+| Roadmap | `gridiron://roadmap` | Project phases and status |
+| Agent Personas | `gridiron://agents/*` | Dev, Plan, QA, Review, Requirements |
+
+**Tools (6 total):**
+| Tool | Description |
+|------|-------------|
+| `get_repo_info` | Get details about a specific repository |
+| `get_github_project` | Get the GitHub project board for a repo |
+| `list_resources` | List all available resources |
+| `get_tech_stack` | Get technology stack for a repo |
+| `get_hard_rules` | Get mandatory rules that must never be broken |
+| `get_constants_info` | Get info about magic numbers and constants |
+
+### Installation
+
+```bash
+cd mcp-server
+npm install
+npm run build
+```
+
+### Register with Claude Code
+
+```bash
+claude mcp add gridiron-context node dist/index.js
+```
+
+This registers the server at user scope (available in all projects).
+
+### Verify Installation
+
+After restarting Claude Code:
+
+```bash
+claude mcp list
+```
+
+You should see `gridiron-context` in the list.
+
+### Using the MCP Server
+
+Once registered, Claude Code automatically has access to all resources and tools. You can:
+
+- Ask about project architecture and it will reference the correct patterns
+- Request coding guidelines and get repo-specific standards
+- Query the roadmap and get current project status
+- Use tools to get dynamic information about repos
+
+Example prompts that leverage MCP context:
+- "What are the testing guidelines for this project?"
+- "Show me the statistical targets for the simulation engine"
+- "What's the architecture for the multi-repo setup?"
+- "Get info about the gridiron-engine repo"
+
+### Development
+
+To modify the MCP server:
+
+```bash
+cd mcp-server
+npm run dev    # Watch mode for TypeScript
+```
+
+Documentation files are in `mcp-server/docs/`. Edit these to update the context Claude receives.
+
+### Troubleshooting
+
+**MCP server not appearing in `claude mcp list`:**
+- Ensure you ran `npm run build` first
+- Check that `dist/index.js` exists
+- Try removing and re-adding: `claude mcp remove gridiron-context && claude mcp add gridiron-context node dist/index.js`
+
+**Changes not reflected:**
+- MCP servers are loaded on Claude Code startup
+- Restart Claude Code after making changes
+
+**Build errors:**
+- Ensure Node.js 18+ is installed
+- Run `npm install` to install dependencies
