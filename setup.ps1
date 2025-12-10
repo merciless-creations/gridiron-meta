@@ -18,14 +18,54 @@ Write-Host "Checking for project repositories..." -ForegroundColor Yellow
 $repos = @("gridiron", "gridiron-engine", "gridiron-web")
 $org = "merciless-creations"
 
+# Check if any repos need cloning
+$needClone = $false
+foreach ($repo in $repos) {
+    if (-not (Test-Path $repo)) {
+        $needClone = $true
+        break
+    }
+}
+
+# If we need to clone, check SSH access first
+$useSSH = $true
+if ($needClone) {
+    Write-Host "  Checking GitHub access..." -ForegroundColor Gray
+    $sshTest = ssh -T git@github.com 2>&1
+    if ($sshTest -match "successfully authenticated") {
+        Write-Host "  [OK] SSH access configured" -ForegroundColor Green
+    } else {
+        Write-Host ""
+        Write-Host "  [WARN] SSH access to GitHub not configured." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "  To configure SSH (recommended):" -ForegroundColor White
+        Write-Host "    1. Generate a key:  ssh-keygen -t ed25519 -C `"your-email@example.com`""
+        Write-Host "    2. Start agent:     Get-Service ssh-agent | Set-Service -StartupType Manual; Start-Service ssh-agent"
+        Write-Host "    3. Add key:         ssh-add $env:USERPROFILE\.ssh\id_ed25519"
+        Write-Host "    4. Copy public key: Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard"
+        Write-Host "    5. Add to GitHub:   https://github.com/settings/keys"
+        Write-Host ""
+        $choice = Read-Host "  Use HTTPS instead? [Y/n]"
+        if ($choice -eq "n" -or $choice -eq "N") {
+            Write-Host ""
+            Write-Host "  Setup paused. Configure SSH and re-run this script." -ForegroundColor Yellow
+            exit 0
+        } else {
+            $useSSH = $false
+            Write-Host "  [OK] Will use HTTPS (may prompt for credentials)" -ForegroundColor Green
+        }
+        Write-Host ""
+    }
+}
+
 foreach ($repo in $repos) {
     if (Test-Path $repo) {
         Write-Host "  [OK] $repo already exists" -ForegroundColor Green
     } else {
         Write-Host "  [CLONE] Cloning $repo..." -ForegroundColor Blue
-        try {
+        if ($useSSH) {
             git clone "git@github.com:${org}/${repo}.git"
-        } catch {
+        } else {
             git clone "https://github.com/${org}/${repo}.git"
         }
     }
@@ -47,7 +87,6 @@ if (Test-Path $commandsTarget) {
     Write-Host "  [SKIP] ~/.claude/commands already exists" -ForegroundColor Gray
     Write-Host "         If you need to update it, remove it first and re-run setup" -ForegroundColor Gray
 } else {
-    # Create junction (doesn't require admin)
     cmd /c "mklink /J `"$commandsTarget`" `"$commandsSource`""
     Write-Host "  [OK] Created junction to shared commands" -ForegroundColor Green
 }
@@ -74,7 +113,6 @@ if (Test-Path $mcpDir) {
         Write-Host "  [OK] MCP server already built" -ForegroundColor Green
     }
 
-    # Check if already registered
     $mcpList = claude mcp list 2>$null
     if ($mcpList -match "gridiron-context") {
         Write-Host "  [OK] MCP server already registered" -ForegroundColor Green

@@ -24,12 +24,58 @@ echo "Checking for project repositories..."
 REPOS=("gridiron" "gridiron-engine" "gridiron-web")
 ORG="merciless-creations"
 
+# Check if any repos need cloning
+NEED_CLONE=false
+for repo in "${REPOS[@]}"; do
+    if [ ! -d "$repo" ]; then
+        NEED_CLONE=true
+        break
+    fi
+done
+
+# If we need to clone, check SSH access first
+USE_SSH=true
+if [ "$NEED_CLONE" = true ]; then
+    echo "  Checking GitHub access..."
+    if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        echo "  [OK] SSH access configured"
+    else
+        echo ""
+        echo "  [WARN] SSH access to GitHub not configured."
+        echo ""
+        echo "  To configure SSH (recommended):"
+        echo "    1. Generate a key:  ssh-keygen -t ed25519 -C \"your-email@example.com\""
+        echo "    2. Start agent:     eval \"\$(ssh-agent -s)\""
+        echo "    3. Add key:         ssh-add ~/.ssh/id_ed25519"
+        echo "    4. Copy public key: cat ~/.ssh/id_ed25519.pub"
+        echo "    5. Add to GitHub:   https://github.com/settings/keys"
+        echo ""
+        read -p "  Use HTTPS instead? [Y/n]: " choice
+        case "$choice" in
+            [nN]*)
+                echo ""
+                echo "  Setup paused. Configure SSH and re-run this script."
+                exit 0
+                ;;
+            *)
+                USE_SSH=false
+                echo "  [OK] Will use HTTPS (may prompt for credentials)"
+                ;;
+        esac
+        echo ""
+    fi
+fi
+
 for repo in "${REPOS[@]}"; do
     if [ -d "$repo" ]; then
         echo "  [OK] $repo already exists"
     else
         echo "  [CLONE] Cloning $repo..."
-        git clone "git@github.com:$ORG/$repo.git" || git clone "https://github.com/$ORG/$repo.git"
+        if [ "$USE_SSH" = true ]; then
+            git clone "git@github.com:$ORG/$repo.git"
+        else
+            git clone "https://github.com/$ORG/$repo.git"
+        fi
     fi
 done
 echo ""
@@ -48,7 +94,6 @@ if [ "$IS_WINDOWS" = true ]; then
         echo "  [SKIP] ~/.claude/commands already exists"
         echo "         If you need to update it, remove it first and re-run setup"
     else
-        # Use Windows junction via cmd (works without admin)
         cmd //c "mklink /J \"$(cygpath -w "$COMMANDS_TARGET")\" \"$(cygpath -w "$COMMANDS_SOURCE")\""
         echo "  [OK] Created junction to shared commands"
     fi
@@ -89,7 +134,6 @@ if [ -d "mcp-server" ]; then
         echo "  [OK] MCP server already built"
     fi
 
-    # Check if already registered
     if claude mcp list 2>/dev/null | grep -q "gridiron-context"; then
         echo "  [OK] MCP server already registered"
     else
