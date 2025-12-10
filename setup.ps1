@@ -41,11 +41,13 @@ if ($needClone) {
         Write-Host "  [WARN] SSH access to GitHub not configured." -ForegroundColor Yellow
         Write-Host ""
         Write-Host "  To configure SSH (recommended):" -ForegroundColor White
-        Write-Host "    1. Generate a key:  ssh-keygen -t ed25519 -C `"your-email@example.com`""
-        Write-Host "    2. Start agent:     Get-Service ssh-agent | Set-Service -StartupType Manual; Start-Service ssh-agent"
+        Write-Host "    1. Generate key:    ssh-keygen -t ed25519 -C `"your-email@example.com`""
+        Write-Host "    2. Start agent (REQUIRES ADMIN TERMINAL):" -ForegroundColor DarkYellow
+        Write-Host "                        Get-Service ssh-agent | Set-Service -StartupType Manual; Start-Service ssh-agent"
         Write-Host "    3. Add key:         ssh-add `$env:USERPROFILE\.ssh\id_ed25519"
         Write-Host "    4. Copy public key: Get-Content `$env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard"
         Write-Host "    5. Add to GitHub:   https://github.com/settings/keys"
+        Write-Host "    6. Test:            ssh -T git@github.com"
         Write-Host ""
         $choice = Read-Host "  Use HTTPS instead? [Y/n]"
         if ($choice -eq "n" -or $choice -eq "N") {
