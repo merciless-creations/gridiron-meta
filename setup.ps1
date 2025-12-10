@@ -31,7 +31,9 @@ foreach ($repo in $repos) {
 $useSSH = $true
 if ($needClone) {
     Write-Host "  Checking GitHub access..." -ForegroundColor Gray
-    $sshTest = ssh -T git@github.com 2>&1
+    $ErrorActionPreference = "Continue"
+    $sshTest = (ssh -T git@github.com 2>&1) | Out-String
+    $ErrorActionPreference = "Stop"
     if ($sshTest -match "successfully authenticated") {
         Write-Host "  [OK] SSH access configured" -ForegroundColor Green
     } else {
@@ -41,8 +43,8 @@ if ($needClone) {
         Write-Host "  To configure SSH (recommended):" -ForegroundColor White
         Write-Host "    1. Generate a key:  ssh-keygen -t ed25519 -C `"your-email@example.com`""
         Write-Host "    2. Start agent:     Get-Service ssh-agent | Set-Service -StartupType Manual; Start-Service ssh-agent"
-        Write-Host "    3. Add key:         ssh-add $env:USERPROFILE\.ssh\id_ed25519"
-        Write-Host "    4. Copy public key: Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard"
+        Write-Host "    3. Add key:         ssh-add `$env:USERPROFILE\.ssh\id_ed25519"
+        Write-Host "    4. Copy public key: Get-Content `$env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard"
         Write-Host "    5. Add to GitHub:   https://github.com/settings/keys"
         Write-Host ""
         $choice = Read-Host "  Use HTTPS instead? [Y/n]"
