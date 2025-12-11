@@ -570,6 +570,17 @@ server.tool(
           "Tests that depend on external state",
         ],
         required: "Use fixed seeds: var game = new Game { RandomSeed = 12345 };",
+        engineSpecific: {
+          rule: "gridiron-engine tests MUST use TestFluentSeedableRandom with fluent methods",
+          location: "tests/Gridiron.Engine.Tests/Helpers/TestFluentSeedableRandom.cs",
+          correct: "new TestFluentSeedableRandom().PassProtectionCheck(0.5).PassCompletionCheck(0.3).AirYards(15)",
+          forbidden: [
+            "Using deprecated __NextDouble or __NextInt arrays",
+            "Using generic NextDouble() or NextInt() without descriptive fluent methods",
+            "Raw Random or SeedableRandom in unit tests",
+          ],
+          reason: "Fluent methods are self-documenting, validated, and provide clear error messages",
+        },
       },
       interaction: {
         rule: "WAIT FOR EXPLICIT APPROVAL before implementing",
